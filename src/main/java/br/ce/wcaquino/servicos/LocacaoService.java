@@ -7,11 +7,25 @@ import java.util.Date;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
-import br.ce.wcaquino.utils.DataUtils;
+import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
+import br.ce.wcaquino.exceptions.LocadoraException;
 
 public class LocacaoService {
 	
-	public Locacao alugarFilme(Usuario usuario, Filme filme) {
+	public Locacao alugarFilme(Usuario usuario, Filme filme) throws LocadoraException, FilmeSemEstoqueException {
+		
+		if(usuario == null) {
+			throw new LocadoraException("Usuário vazio!");
+		}
+
+		if(filme == null) {
+			throw new LocadoraException("Filme vazio!");
+		}
+		
+		if(filme.getEstoque() == 0) {
+			throw new FilmeSemEstoqueException();
+		}
+		
 		Locacao locacao = new Locacao();
 		locacao.setFilme(filme);
 		locacao.setUsuario(usuario);
@@ -29,19 +43,4 @@ public class LocacaoService {
 		return locacao;
 	}
 
-	public static void main(String[] args) {
-		//cenário
-		LocacaoService locacaoService = new LocacaoService();
-		Usuario usuario = new Usuario("Douglas");
-		Filme filme = new Filme("Oz", 2, 4.5);
-		
-		//acao
-		Locacao locacao = locacaoService.alugarFilme(usuario, filme);
-		
-		//verificação
-		System.out.println(locacao.getValor() == 4.5);
-		System.out.println(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()));
-		System.out.println(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)));
-		
-	}
 }
