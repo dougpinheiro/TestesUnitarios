@@ -36,8 +36,27 @@ public class LocacaoService {
 		
 		double total = 0.0d;
 		
+		int count = 0;
+		
 		for(Filme f : filmes) {
-			total+=f.getPrecoLocacao();
+			count++;
+			switch (count) {
+			case 3:
+				total+=(f.getPrecoLocacao() * (1-0.25));								
+				break;
+			case 4:
+				total+=(f.getPrecoLocacao() * (1-0.50));								
+				break;
+			case 5:
+				total+=(f.getPrecoLocacao() * (1-0.75));												
+				break;
+			case 6:
+				total+=(f.getPrecoLocacao() * 0);																
+				break;
+			default:
+				total+=f.getPrecoLocacao();				
+				break;
+			}
 		}
 		
 		locacao.setValor(total);
