@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.ce.wcaquino.builders.UsuarioBuilder;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -28,7 +29,7 @@ public class CalculoValorLotacaoTest {
 	@Test
 	public void deveCalcularValorLotacaoConsiderandoDescontos() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("douglas.pinheiro");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 		
 		Filme filme1 = new Filme("Oz2", 2, 5.0);
 		Filme filme2 = new Filme("The Lion King1", 3, 5.0);

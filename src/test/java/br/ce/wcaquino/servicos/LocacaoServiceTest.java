@@ -9,16 +9,16 @@ import java.util.List;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import br.ce.wcaquino.builders.FilmeBuilder;
+import br.ce.wcaquino.builders.UsuarioBuilder;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -26,6 +26,7 @@ import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.matchers.MatchersProprios;
 import br.ce.wcaquino.utils.DataUtils;
+
 
 public class LocacaoServiceTest {
 
@@ -38,16 +39,7 @@ public class LocacaoServiceTest {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
-
-	@BeforeClass
-	public static void setupBeforeClass() {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() {
-
-	}
-
+	
 	@Before
 	public void setup() {
 		locacaoService = new LocacaoService();
@@ -63,9 +55,9 @@ public class LocacaoServiceTest {
 		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 		
 		//cenário
-		Usuario usuario = new Usuario("Douglas");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 
-		Filme filme1 = new Filme("Oz", 2, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().agora();
 
 		List<Filme> filmes = Arrays.asList(filme1);
 
@@ -83,10 +75,10 @@ public class LocacaoServiceTest {
 	@Test(expected=FilmeSemEstoqueException.class)
 	public void deveLancarExcecaoQuandoNaoHouverEstoque() throws Exception {
 		//cenário
-		Usuario usuario = new Usuario("Douglas");
-		Filme filme1 = new Filme("Oz", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King", 0, 7.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
+		Filme filme1 = FilmeBuilder.umFilmeSemEstoque().agora();
+		Filme filme2 = FilmeBuilder.umFilme().agora();
+		Filme filme3 = FilmeBuilder.umFilme().agora();
 
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3);
 
@@ -97,9 +89,9 @@ public class LocacaoServiceTest {
 	@Test
 	public void naoDeveAlugarFilmeSemUsuario() throws FilmeSemEstoqueException {
 		//cenario
-		Filme filme1 = new Filme("Oz", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King", 3, 7.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().agora();
+		Filme filme2 = FilmeBuilder.umFilme().agora();
+		Filme filme3 = FilmeBuilder.umFilme().agora();
 
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3);
 
@@ -117,7 +109,7 @@ public class LocacaoServiceTest {
 	@Test
 	public void naoDeveAlugarFilmeSemFilme() throws FilmeSemEstoqueException, LocadoraException {
 		//cenario
-		Usuario usuario = new Usuario("Douglas");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 
 		expectedException.expect(LocadoraException.class);
 		expectedException.expectMessage("Filme vazio!");
@@ -130,11 +122,11 @@ public class LocacaoServiceTest {
 	@Test
 	public void deveAplicarDescontoDe25PctNoTerceiroFilme() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("douglas.pinheiro");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 		
-		Filme filme1 = new Filme("Oz2", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King1", 3, 5.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().agora();
+		Filme filme2 = FilmeBuilder.umFilme().agora();
+		Filme filme3 = FilmeBuilder.umFilme().agora();
 		
 
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3);
@@ -149,12 +141,12 @@ public class LocacaoServiceTest {
 	@Test
 	public void deveAplicarDescontoDe50PctNoQuartoFilme() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("douglas.pinheiro");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 		
-		Filme filme1 = new Filme("Oz2", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King1", 3, 5.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
-		Filme filme4 = new Filme("The Lion King", 3, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme2 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme3 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme4 = FilmeBuilder.umFilme().comValor(5.0).agora();
 		
 		
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4);
@@ -169,13 +161,13 @@ public class LocacaoServiceTest {
 	@Test
 	public void deveAplicarDescontoDe75PctNoQuintoFilme() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("douglas.pinheiro");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 		
-		Filme filme1 = new Filme("Oz2", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King1", 3, 5.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
-		Filme filme4 = new Filme("The Lion King", 3, 5.0);
-		Filme filme5 = new Filme("Titanic", 10, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme2 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme3 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme4 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme5 = FilmeBuilder.umFilme().comValor(5.0).agora();
 		
 		
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4, filme5);
@@ -190,14 +182,14 @@ public class LocacaoServiceTest {
 	@Test
 	public void deveAplicarDescontoDe100PctNoSextoFilme() throws LocadoraException, FilmeSemEstoqueException {
 		//cenario
-		Usuario usuario = new Usuario("douglas.pinheiro");
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
 		
-		Filme filme1 = new Filme("Oz2", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King1", 3, 5.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
-		Filme filme4 = new Filme("The Lion King", 3, 5.0);
-		Filme filme5 = new Filme("Titanic", 10, 5.0);
-		Filme filme6 = new Filme("Oz2", 2, 5.0);
+		Filme filme1 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme2 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme3 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme4 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme5 = FilmeBuilder.umFilme().comValor(5.0).agora();
+		Filme filme6 = FilmeBuilder.umFilme().comValor(5.0).agora();
 		
 		
 		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3, filme4, filme5, filme6);
@@ -214,8 +206,8 @@ public class LocacaoServiceTest {
 		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
 		//cenário
-		Usuario usuario = new Usuario("UsuarioTeste");
-		Filme filme1 = new Filme("Oz2", 1, 5.0);
+		Usuario usuario = UsuarioBuilder.umUsuario().agora();
+		Filme filme1 = FilmeBuilder.umFilme().comValor(5.0).agora();
 		List<Filme> filmes = Arrays.asList(filme1);
 		
 		//ação
@@ -226,11 +218,5 @@ public class LocacaoServiceTest {
 		Assert.assertThat(locacao.getDataRetorno(), caiNumaSegunda());
 		//Assert.assertThat(locacao.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
 	}
-
-	
-	
-
-
-
 
 }
