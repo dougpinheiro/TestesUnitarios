@@ -1,6 +1,9 @@
 package br.ce.wcaquino.servicos;
 
+import static br.ce.wcaquino.matchers.MatchersProprios.caiNumaSegunda;
+
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -20,6 +24,7 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueException;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.matchers.MatchersProprios;
 import br.ce.wcaquino.utils.DataUtils;
 
 public class LocacaoServiceTest {
@@ -55,22 +60,24 @@ public class LocacaoServiceTest {
 
 	@Test
 	public void deveAlugarFilme() throws Exception {
+		Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+		
 		//cenário
 		Usuario usuario = new Usuario("Douglas");
 
 		Filme filme1 = new Filme("Oz", 2, 5.0);
-		Filme filme2 = new Filme("The Lion King", 3, 7.0);
-		Filme filme3 = new Filme("Titanic", 10, 5.0);
 
-		List<Filme> filmes = Arrays.asList(filme1, filme2, filme3);
+		List<Filme> filmes = Arrays.asList(filme1);
 
 		//acao
 		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
 
 		//verificação
-		errorCollector.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(15.75)));
-		errorCollector.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
-		errorCollector.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(true));			
+		//errorCollector.checkThat(locacao.getValor(), CoreMatchers.is(CoreMatchers.equalTo(5.0)));
+		//errorCollector.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), CoreMatchers.is(true));
+		errorCollector.checkThat(locacao.getDataLocacao(), MatchersProprios.ehHoje());
+		//errorCollector.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), CoreMatchers.is(true));			
+		errorCollector.checkThat(locacao.getDataRetorno(), MatchersProprios.ehHojeComDiferencaDias(1));			
 	}
 
 	@Test(expected=FilmeSemEstoqueException.class)
@@ -201,7 +208,26 @@ public class LocacaoServiceTest {
 		Assert.assertEquals(Double.valueOf(17.50d), locacao.getValor(), 0.01);
 		
 	}
+	
+	@Test
+	public void naoDeveDevolverFilmeNoDomingo() throws LocadoraException, FilmeSemEstoqueException {
+		Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
+		//cenário
+		Usuario usuario = new Usuario("UsuarioTeste");
+		Filme filme1 = new Filme("Oz2", 1, 5.0);
+		List<Filme> filmes = Arrays.asList(filme1);
+		
+		//ação
+		Locacao locacao = locacaoService.alugarFilme(usuario, filmes);
+		
+		//verificação
+		//Assert.assertThat(locacao.getDataRetorno(), MatchersProprios.caiEm(Calendar.WEDNESDAY));
+		Assert.assertThat(locacao.getDataRetorno(), caiNumaSegunda());
+		//Assert.assertThat(locacao.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
+	}
+
+	
 	
 
 
